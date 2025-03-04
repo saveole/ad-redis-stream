@@ -3,5 +3,11 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
-      stream:
-        key: xxx-
+      password:
+      # 可选配置
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
