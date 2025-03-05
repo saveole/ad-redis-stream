@@ -15,7 +15,7 @@ import java.util.Map;
 public class StreamConsumer {
 
     @Autowired
-    private StreamMessageListenerContainer<String, ObjectRecord<String, Map<String, Object>>> streamMessageListenerContainer;
+    private StreamMessageListenerContainer<String, ObjectRecord<String, String>> container;
 
     private static final String STREAM_KEY = "my-stream";
     private static final String GROUP_NAME = "my-group";
@@ -27,11 +27,11 @@ public class StreamConsumer {
         Consumer consumer = Consumer.from(GROUP_NAME, CONSUMER_NAME);
 
         // 订阅 Stream 并处理消息
-        streamMessageListenerContainer.receive(
+        container.receive(
                 consumer,
                 StreamOffset.create(STREAM_KEY, ReadOffset.lastConsumed()),
                 message -> {
-                    Map<String, Object> content = message.getValue();
+                    var content = message.getValue();
                     System.out.println("Consumed message: " + content);
 
                     // 确认消息已处理（手动 ACK）
@@ -40,6 +40,6 @@ public class StreamConsumer {
         );
 
         // 启动容器
-        streamMessageListenerContainer.start();
+        container.start();
     }
 }

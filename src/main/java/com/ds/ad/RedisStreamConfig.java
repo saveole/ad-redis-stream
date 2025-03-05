@@ -21,17 +21,17 @@ public class RedisStreamConfig {
     private static final String GROUP_NAME = "my-group";
 
     @Bean
-    public StreamMessageListenerContainer<String, ObjectRecord<String, Map>> streamMessageListenerContainer() {
+    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> container() {
         // 配置 Stream 监听容器
-        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, Map>> options =
+        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options =
                 StreamMessageListenerContainer.StreamMessageListenerContainerOptions
                         .builder()
                         .pollTimeout(Duration.ofSeconds(5)) // 轮询超时
-                        .targetType(Map.class) // 消息反序列化为 Map
+                        .targetType(String.class)// 消息反序列化为 Map
                         .build();
 
         // 创建监听容器
-        StreamMessageListenerContainer<String, ObjectRecord<String, Map>> container =
+        StreamMessageListenerContainer<String, ObjectRecord<String, String>> container =
                 StreamMessageListenerContainer.create(redisConnectionFactory, options);
 
         // 创建消费者组（如果不存在）
