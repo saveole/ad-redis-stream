@@ -2,10 +2,10 @@ package com.ds.ad;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.stream.Consumer;
-import org.springframework.data.redis.connection.stream.ObjectRecord;
-import org.springframework.data.redis.connection.stream.ReadOffset;
-import org.springframework.data.redis.connection.stream.StreamOffset;
+import org.springframework.data.redis.connection.stream.*;
+import org.springframework.data.redis.core.StreamOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.types.RedisClientInfo;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,10 @@ import java.util.Map;
 public class StreamConsumer {
 
     @Autowired
-    private StreamMessageListenerContainer<String, ObjectRecord<String, String>> container;
+    private StreamMessageListenerContainer<String, ObjectRecord<String, Message>> container;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     private static final String STREAM_KEY = "my-stream";
     private static final String GROUP_NAME = "my-group";
@@ -25,17 +28,23 @@ public class StreamConsumer {
     public void startConsumer() {
         // 配置消费者
         Consumer consumer = Consumer.from(GROUP_NAME, CONSUMER_NAME);
+        var streamOps = stringRedisTemplate.opsForStream();
 
         // 订阅 Stream 并处理消息
         container.receive(
                 consumer,
                 StreamOffset.create(STREAM_KEY, ReadOffset.lastConsumed()),
                 message -> {
+                    var recordId = message.getId();
+                    System.out.println(message.getClass());
+                    var msg = message.toString();
+                    System.out.println("Consumed msg: " + msg);
                     var content = message.getValue();
-                    System.out.println("Consumed message: " + content);
-
-                    // 确认消息已处理（手动 ACK）
-                    //streamMessageListenerContainer.receiveAutoAck()
+                    System.out.println("Consumed message: " + content.getId());
+                    System.out.println("Consumed message: " + content.getContent());
+                    // 手动 ACK
+                    var acked = streamOps.acknowledge(STREAM_KEY, GROUP_NAME, recordId);
+                    System.out.println("Acked: " + acked);
                 }
         );
 

@@ -9,7 +9,6 @@ import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 
 import java.time.Duration;
-import java.util.Map;
 
 @Configuration
 public class RedisStreamConfig {
@@ -21,17 +20,17 @@ public class RedisStreamConfig {
     private static final String GROUP_NAME = "my-group";
 
     @Bean
-    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> container() {
+    public StreamMessageListenerContainer<String, ObjectRecord<String, Message>> container() {
         // 配置 Stream 监听容器
-        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> options =
+        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, Message>> options =
                 StreamMessageListenerContainer.StreamMessageListenerContainerOptions
                         .builder()
                         .pollTimeout(Duration.ofSeconds(5)) // 轮询超时
-                        .targetType(String.class)// 消息反序列化为 Map
+                        .targetType(Message.class)// 消息反序列化为 Map
                         .build();
 
         // 创建监听容器
-        StreamMessageListenerContainer<String, ObjectRecord<String, String>> container =
+        StreamMessageListenerContainer<String, ObjectRecord<String, Message>> container =
                 StreamMessageListenerContainer.create(redisConnectionFactory, options);
 
         // 创建消费者组（如果不存在）
