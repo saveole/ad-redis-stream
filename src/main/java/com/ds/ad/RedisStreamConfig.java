@@ -22,16 +22,14 @@ public class RedisStreamConfig {
     @Bean
     public StreamMessageListenerContainer<String, ObjectRecord<String, Message>> container() {
         // 配置 Stream 监听容器
-        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, Message>> options =
-                StreamMessageListenerContainer.StreamMessageListenerContainerOptions
-                        .builder()
-                        .pollTimeout(Duration.ofSeconds(5)) // 轮询超时
-                        .targetType(Message.class)// 消息反序列化为 Map
-                        .build();
+        var options = StreamMessageListenerContainer.StreamMessageListenerContainerOptions
+                .builder()
+                .pollTimeout(Duration.ofSeconds(5)) // 轮询超时
+                .targetType(Message.class)// 消息反序列化为 Map
+                .build();
 
         // 创建监听容器
-        StreamMessageListenerContainer<String, ObjectRecord<String, Message>> container =
-                StreamMessageListenerContainer.create(redisConnectionFactory, options);
+        var container = StreamMessageListenerContainer.create(redisConnectionFactory, options);
 
         // 创建消费者组（如果不存在）
         try {
