@@ -26,7 +26,7 @@ public class StreamConsumer {
 
     @PostConstruct
     public void startConsumer() {
-        // 配置消费者
+        // 配置消费者，集群消费场景的话需要配置不同 CONSUMER_NAME
         Consumer consumer = Consumer.from(GROUP_NAME, CONSUMER_NAME);
         var streamOps = stringRedisTemplate.opsForStream();
 
